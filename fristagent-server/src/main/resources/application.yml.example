@@ -59,9 +59,15 @@ fristagent:
   skill:
     data-dir: ${user.home}/.fristagent/skills
 
-  # GitHub Token（可选，私有仓库下载 Diff 时需要）
+  # GitHub Token（私有仓库下载 Diff 时必填，公开仓库也强烈建议配置以避免限流）
+  # 所需权限：repo（私有仓库）或 public_repo（公开仓库）
   github:
-    token: ${GITHUB_TOKEN:}
+    token: ${GITHUB_TOKEN:YOUR_GITHUB_TOKEN}
+
+  # GitLab Token（可选，私有仓库下载 Diff 时需要）
+  # 所需权限：read_api 或 read_repository
+  gitlab:
+    token: ${GITLAB_TOKEN:}
 
   # 飞书开放平台配置（可选，不配置则跳过飞书通知）
   feishu:

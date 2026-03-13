@@ -21,19 +21,29 @@ public class DiffParser {
     @Value("${fristagent.github.token:}")
     private String githubToken;
 
+    @Value("${fristagent.gitlab.token:}")
+    private String gitlabToken;
+
     private static final int MAX_DIFF_CHARS = 80_000; // 约 1000 行，防止超过 token 限制
 
     /**
      * 从 diffUrl 下载 diff 文本并解析为结构化 DiffContext
      */
     public DiffContext fetchAndParse(MergeRequestEvent event) {
-        String rawDiff = downloadDiff(event.diffUrl());
+        String rawDiff = downloadDiff(event.diffUrl(), event.platform());
+        log.info("[DiffParser] platform={}, url={}, rawDiff length={}",
+                event.platform(), event.diffUrl(), rawDiff.length());
         if (rawDiff.length() > MAX_DIFF_CHARS) {
             log.warn("Diff too large ({} chars), truncating for scan task prNumber={}",
                     rawDiff.length(), event.prNumber());
             rawDiff = rawDiff.substring(0, MAX_DIFF_CHARS) + "\n... (truncated)";
         }
         List<DiffContext.FileDiff> files = parseUnifiedDiff(rawDiff);
+        log.info("[DiffParser] parsed {} file(s) from diff", files.size());
+        if (files.isEmpty()) {
+            log.warn("[DiffParser] No files parsed — rawDiff preview: {}",
+                    rawDiff.substring(0, Math.min(300, rawDiff.length())));
+        }
         return new DiffContext(
                 event.prTitle(),
                 event.prAuthor(),
@@ -43,12 +53,39 @@ public class DiffParser {
         );
     }
 
-    private String downloadDiff(String diffUrl) {
-        RestClient client = RestClient.builder()
-                .defaultHeader(HttpHeaders.ACCEPT, "text/plain, application/vnd.github.v3.diff")
-                .build();
-        String result = client.get().uri(diffUrl).retrieve().body(String.class);
-        return result != null ? result : "";
+    /**
+     * 按平台添加认证头，下载 diff 原文
+     */
+    private String downloadDiff(String diffUrl, MergeRequestEvent.Platform platform) {
+        RestClient.Builder builder = RestClient.builder();
+
+        if (platform == MergeRequestEvent.Platform.GITHUB) {
+            // GitHub REST API: Accept vnd.github.v3.diff 直接返回 unified diff 文本
+            builder.defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3.diff");
+            if (githubToken != null && !githubToken.isBlank()) {
+                builder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
+                log.debug("[DiffParser] GitHub request with token");
+            } else {
+                log.warn("[DiffParser] GitHub token not configured — diff download may fail for private repos");
+            }
+        } else if (platform == MergeRequestEvent.Platform.GITLAB) {
+            builder.defaultHeader(HttpHeaders.ACCEPT, "text/plain");
+            if (gitlabToken != null && !gitlabToken.isBlank()) {
+                builder.defaultHeader("PRIVATE-TOKEN", gitlabToken);
+                log.debug("[DiffParser] GitLab request with token");
+            } else {
+                log.warn("[DiffParser] GitLab token not configured — diff download may fail for private repos");
+            }
+        }
+
+        try {
+            RestClient client = builder.build();
+            String result = client.get().uri(diffUrl).retrieve().body(String.class);
+            return result != null ? result : "";
+        } catch (Exception e) {
+            log.error("[DiffParser] Failed to download diff from {}: {}", diffUrl, e.getMessage());
+            return "";
+        }
     }
 
     /**

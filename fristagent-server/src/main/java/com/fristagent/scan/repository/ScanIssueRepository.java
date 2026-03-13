@@ -2,8 +2,10 @@ package com.fristagent.scan.repository;
 
 import com.fristagent.scan.model.ScanIssue;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,6 +14,8 @@ public interface ScanIssueRepository extends JpaRepository<ScanIssue, Long> {
 
     List<ScanIssue> findByTaskIdOrderBySeverityDesc(Long taskId);
 
+    @Modifying
+    @Transactional
     void deleteByTaskId(Long taskId);
 
     @Query("SELECT i.issueType, COUNT(i) FROM ScanIssue i GROUP BY i.issueType")

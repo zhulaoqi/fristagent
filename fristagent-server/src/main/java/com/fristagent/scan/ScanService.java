@@ -45,7 +45,7 @@ public class ScanService {
         log.info("Scan triggered: platform={}, repo={}, pr={}",
                 event.platform(), event.repoName(), event.prNumber());
 
-        ScanTask task = createOrResetTask(event);
+        ScanTask task = createTask(event);
 
         try {
             // Step 1: 获取 Diff
@@ -55,9 +55,14 @@ public class ScanService {
             // Step 2: 准备 Skill
             progress(task, "SCANNING", "加载 Skill: " + task.getSkillName(), 30);
 
-            // Step 3: LLM 分析（耗时最长的步骤）
+            // Step 3: LLM 分析（流式推送每个 chunk 到前端）
             progress(task, "SCANNING", "AI 分析中，请稍候...", 50);
-            ReviewResult result = agentCore.review(diff);
+            ReviewResult result = agentCore.review(diff, chunk ->
+                    wsHandler.broadcast(WsMessage.builder()
+                            .type("SCAN_LOG")
+                            .taskId(task.getId())
+                            .chunk(chunk)
+                            .build()));
 
             // Step 4: 通知（先发，不影响最终状态）
             progress(task, "SCANNING", "发送通知...", 85);
@@ -96,10 +101,8 @@ public class ScanService {
     }
 
     @Transactional
-    protected ScanTask createOrResetTask(MergeRequestEvent event) {
-        ScanTask task = scanTaskRepository
-                .findByRepoIdAndPrNumber(event.repoId(), event.prNumber())
-                .orElse(new ScanTask());
+    protected ScanTask createTask(MergeRequestEvent event) {
+        ScanTask task = new ScanTask();
 
         task.setRepoId(event.repoId());
         task.setPlatform(event.platform().name());

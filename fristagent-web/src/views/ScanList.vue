@@ -10,6 +10,7 @@ import dayjs from 'dayjs'
 
 const router = useRouter()
 const scanStore = useScanStore()
+
 const loading = ref(false)
 const search = ref('')
 const filterStatus = ref('')
@@ -139,7 +140,7 @@ const fmt = (d) => dayjs(d).format('MM/DD HH:mm')
             </td>
             <td><span class="time">{{ fmt(s.createdAt) }}</span></td>
           </tr>
-          <!-- 实时进度条行（仅 SCANNING 状态显示） -->
+          <!-- 实时进度行（仅 SCANNING 状态显示） -->
           <tr v-if="s.status === 'SCANNING'" class="progress-tr">
             <td colspan="7">
               <div class="scan-progress">

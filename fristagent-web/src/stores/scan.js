@@ -9,6 +9,8 @@ import { useWebSocket } from '@/composables/useWebSocket'
 export const useScanStore = defineStore('scan', () => {
   // taskId → { status, step, percent, score, summary }
   const progress = ref({})
+  // taskId → 累积的 LLM 流式文本（SCAN_LOG chunks）
+  const streamLog = ref({})
 
   useWebSocket(['SCAN_PROGRESS', 'SCAN_DONE', 'SCAN_FAILED'], (msg) => {
     const id = String(msg.taskId)
@@ -19,11 +21,25 @@ export const useScanStore = defineStore('scan', () => {
       score:   msg.score   ?? null,
       summary: msg.summary ?? '',
     }
+    // 扫描结束时清空流式日志
+    if (msg.status === 'DONE' || msg.status === 'FAILED') {
+      delete streamLog.value[id]
+    }
+  })
+
+  useWebSocket('SCAN_LOG', (msg) => {
+    const id = String(msg.taskId)
+    if (!streamLog.value[id]) streamLog.value[id] = ''
+    streamLog.value[id] += msg.chunk
   })
 
   function getProgress(taskId) {
     return progress.value[String(taskId)] || null
   }
 
-  return { progress, getProgress }
+  function getStreamLog(taskId) {
+    return streamLog.value[String(taskId)] || ''
+  }
+
+  return { progress, streamLog, getProgress, getStreamLog }
 })

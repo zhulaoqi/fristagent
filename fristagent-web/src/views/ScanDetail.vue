@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, ExternalLink, ShieldAlert, Bug, Zap, Paintbrush, Lightbulb } from 'lucide-vue-next'
 import StatusBadge from '@/components/common/StatusBadge.vue'
@@ -44,6 +44,15 @@ const displaySummary = computed(() => liveProgress.value?.summary || task.value?
 const scanningStep   = computed(() => liveProgress.value?.step    || '')
 const scanningPct    = computed(() => liveProgress.value?.percent ?? 0)
 const isScanning     = computed(() => displayStatus.value === 'SCANNING')
+
+// LLM 流式输出
+const streamLog = computed(() => scanStore.getStreamLog(route.params.id))
+const logRef = ref(null)
+watch(streamLog, () => {
+  nextTick(() => {
+    if (logRef.value) logRef.value.scrollTop = logRef.value.scrollHeight
+  })
+})
 
 const activeFilter = ref('ALL')
 const filters = [
@@ -146,6 +155,15 @@ const getStepState = (index, pct) => {
           </div>
         </div>
         <div class="scanning-current">{{ scanningStep }}</div>
+
+        <!-- LLM 实时输出 -->
+        <div v-if="streamLog" class="stream-log-wrap">
+          <div class="stream-log-label">
+            <span class="stream-dot" />
+            AI 输出实时预览
+          </div>
+          <div class="stream-log-body" ref="logRef">{{ streamLog }}</div>
+        </div>
       </div>
     </Transition>
 
@@ -415,6 +433,52 @@ const getStepState = (index, pct) => {
   font-size: 12px;
   color: var(--text-muted);
   font-style: italic;
+}
+
+/* ---- LLM 流式输出区域 ---- */
+.stream-log-wrap {
+  margin-top: 16px;
+  border-top: 1px solid rgba(37, 99, 235, 0.15);
+  padding-top: 14px;
+}
+
+.stream-log-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.stream-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-blue-2);
+  animation: pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.stream-log-body {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-height: 360px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  /* 滚动条样式 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 /* Transition */

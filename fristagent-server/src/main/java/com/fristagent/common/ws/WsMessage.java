@@ -8,6 +8,7 @@ import lombok.Data;
  *
  * type 枚举：
  *   SCAN_PROGRESS  — 扫描进度更新（step + percent）
+ *   SCAN_LOG       — LLM 流式输出 chunk（AI 分析阶段实时推送）
  *   SCAN_DONE      — 扫描完成（含 score/summary）
  *   SCAN_FAILED    — 扫描失败
  *   SKILL_SWITCHED — Skill 热切换
@@ -25,6 +26,9 @@ public class WsMessage {
     private Integer percent;   // 0-100 进度百分比
     private Integer score;
     private String summary;
+
+    // SCAN_LOG 事件（LLM 流式 chunk）
+    private String chunk;
 
     // SKILL_SWITCHED 事件
     private String skillName;

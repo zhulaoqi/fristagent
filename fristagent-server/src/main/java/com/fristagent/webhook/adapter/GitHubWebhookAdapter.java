@@ -67,16 +67,21 @@ public class GitHubWebhookAdapter implements WebhookAdapter {
                 default -> MergeRequestEvent.Action.SYNCHRONIZED;
             };
 
+            String fullName = repo.path("full_name").asText();
+            long prNum = pr.path("number").asLong();
+            // 使用 GitHub REST API URL（而非 html diff_url），以便通过 Authorization 头正确拉取 diff
+            String diffUrl = "https://api.github.com/repos/" + fullName + "/pulls/" + prNum;
+
             return Optional.of(new MergeRequestEvent(
                     MergeRequestEvent.Platform.GITHUB,
                     repoId,
                     repo.path("html_url").asText(),
-                    repo.path("full_name").asText(),
-                    String.valueOf(pr.path("number").asLong()),
+                    fullName,
+                    String.valueOf(prNum),
                     pr.path("title").asText(),
                     pr.path("user").path("login").asText(),
                     pr.path("html_url").asText(),
-                    pr.path("diff_url").asText(),
+                    diffUrl,
                     pr.path("head").path("ref").asText(),
                     pr.path("base").path("ref").asText(),
                     mrAction

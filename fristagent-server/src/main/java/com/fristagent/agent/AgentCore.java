@@ -6,14 +6,28 @@ import com.fristagent.diff.model.DiffContext;
 import com.fristagent.llm.LlmGateway;
 import com.fristagent.llm.model.ChatMessage;
 import com.fristagent.skill.engine.SkillEngine;
+import com.fristagent.skill.engine.SkillLoader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
- * Agent 核心：加载当前激活的 Skill，将 Diff 上下文格式化后发给 LLM，解析返回结果。
+ * Agent 核心：基于 AgentScope Progressive Disclosure 模式，
+ * 按 diff 上下文动态组装 Skill system-prompt，再驱动 LLM 进行 Code Review。
+ *
+ * <h3>渐进式披露流程</h3>
+ * <ol>
+ *   <li>从 diff 文件路径检测编程语言集合</li>
+ *   <li>始终加载 core.md（角色定义 + 审查维度概览）</li>
+ *   <li>按需加载对应语言的 sections/lang/{lang}.md（深度规则）</li>
+ *   <li>始终加载 output-format.md（JSON 格式约束，放在末尾强化）</li>
+ * </ol>
+ *
+ * <p>好处：对纯 Java PR 不发送 Python/Go 规则，减少无关 token，
+ * 同时让 LLM 聚焦于实际出现的语言的专项规则。
  */
 @Slf4j
 @Service
@@ -21,40 +35,52 @@ import java.util.List;
 public class AgentCore {
 
     private final SkillEngine skillEngine;
+    private final SkillLoader skillLoader;
     private final LlmGateway llmGateway;
     private final ObjectMapper objectMapper;
 
     /**
-     * 对 DiffContext 执行 Code Review，返回结构化结果
+     * 对 DiffContext 执行 Code Review，返回结构化结果。
+     *
+     * @param diff    解析后的 PR diff 上下文
+     * @param onChunk LLM 流式 chunk 回调，每收到一个 token 片段时触发（用于 WebSocket 实时推送）
+     * @return ReviewResult（score + summary + issues[]）
      */
-    public ReviewResult review(DiffContext diff) {
+    public ReviewResult review(DiffContext diff, Consumer<String> onChunk) {
         String skillName = skillEngine.getActiveSkillName();
-        String systemPrompt = skillEngine.loadActiveSystemPrompt();
-        String userPrompt = buildUserPrompt(diff);
 
-        log.info("=== AgentCore.review START ===");
-        log.info("Active skill: {}", skillName);
-        log.info("System prompt length: {} chars, first 200: {}",
-                systemPrompt.length(), systemPrompt.substring(0, Math.min(200, systemPrompt.length())));
-        log.info("Diff files: {}, user prompt length: {} chars",
-                diff.files().size(), userPrompt.length());
+        log.info("=== AgentCore.review START === skill={}, files={}",
+                skillName, diff.files().size());
 
-        String rawResponse = llmGateway.chat(List.of(
-                ChatMessage.system(systemPrompt),
-                ChatMessage.user(userPrompt)
-        ));
+        // ── 渐进式披露：按 diff 上下文组装最小化 system-prompt ─────────────
+        String systemPrompt = skillLoader.buildContextualPrompt(skillName, diff);
+        String userPrompt   = buildUserPrompt(diff);
 
-        log.info("LLM raw response (first 500 chars): {}",
+        log.debug("[AgentCore] system-prompt chars={} (~{} tokens), user-prompt chars={}",
+                systemPrompt.length(), systemPrompt.length() / 4, userPrompt.length());
+
+        // ── 通过 AgentScope OpenAIChatModel 流式调用 LLM ────────────────────
+        // onChunk 回调将每个 token 片段实时推送到 WebSocket
+        String rawResponse = llmGateway.streamChat(
+                List.of(ChatMessage.system(systemPrompt), ChatMessage.user(userPrompt)),
+                onChunk
+        );
+
+        log.info("[AgentCore] LLM raw response (first 500): {}",
                 rawResponse.substring(0, Math.min(500, rawResponse.length())));
 
-        ReviewResult reviewResult = parseReviewResult(rawResponse);
-        log.info("Parsed result: score={}, issues={}, summary={}",
-                reviewResult.score(), reviewResult.issues().size(),
-                reviewResult.summary() != null ? reviewResult.summary().substring(0, Math.min(100, reviewResult.summary().length())) : "null");
-        log.info("=== AgentCore.review END ===");
+        // ── 解析并返回 ──────────────────────────────────────────────────────
+        ReviewResult result = parseReviewResult(rawResponse);
 
-        return reviewResult;
+        log.info("=== AgentCore.review END === skill={} | score={} | issues={}",
+                skillName, result.score(), result.issues().size());
+
+        return result;
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 内部工具
+    // ─────────────────────────────────────────────────────────────────────────
 
     private String buildUserPrompt(DiffContext diff) {
         StringBuilder sb = new StringBuilder();
@@ -66,7 +92,8 @@ public class AgentCore {
         sb.append("## Code Changes\n\n");
 
         for (DiffContext.FileDiff file : diff.files()) {
-            sb.append("### File: `").append(file.path()).append("` (").append(file.changeType()).append(")\n");
+            sb.append("### File: `").append(file.path())
+              .append("` (").append(file.changeType()).append(")\n");
             sb.append("```diff\n");
             sb.append(file.patch());
             sb.append("```\n\n");
@@ -78,20 +105,24 @@ public class AgentCore {
 
     private ReviewResult parseReviewResult(String rawResponse) {
         try {
-            // 清理可能的 markdown 代码块包裹
             String json = rawResponse.trim();
+            // 清理 LLM 可能包裹的 markdown 代码块
             if (json.startsWith("```")) {
                 int start = json.indexOf('\n') + 1;
-                int end = json.lastIndexOf("```");
-                json = json.substring(start, end).trim();
+                int end   = json.lastIndexOf("```");
+                if (end > start) {
+                    json = json.substring(start, end).trim();
+                }
             }
             return objectMapper.readValue(json, ReviewResult.class);
         } catch (Exception e) {
-            log.error("Failed to parse LLM response as ReviewResult, raw: {}", rawResponse, e);
-            // 解析失败时返回降级结果
+            log.error("[AgentCore] Failed to parse LLM response as ReviewResult. raw={}",
+                    rawResponse.substring(0, Math.min(300, rawResponse.length())), e);
+            // 降级：保留原始回复供排查，score=0 触发人工关注
             return new ReviewResult(
                     0,
-                    "Review parsing failed. Raw response: " + rawResponse.substring(0, Math.min(200, rawResponse.length())),
+                    "Review parsing failed. Raw LLM response: "
+                            + rawResponse.substring(0, Math.min(200, rawResponse.length())),
                     List.of()
             );
         }

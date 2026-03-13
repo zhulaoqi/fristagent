@@ -76,24 +76,24 @@ graph TB
     end
 
     subgraph FristAgent Server
-        WH[WebhookController<br/>签名验证]
-        SS[ScanService<br/>@Async 异步]
-        DP[DiffParser<br/>拉取&解析 Diff]
-        SE[SkillEngine<br/>加载 system-prompt]
-        AC[AgentCore<br/>格式化 + 调用 LLM]
-        LLM[LlmGateway<br/>OpenAI 兼容协议]
-        DB[(MySQL<br/>scan_task / scan_issue)]
-        RD[(Redis<br/>热配置 / 缓存)]
-        NS[NotifyService<br/>飞书 + 邮件]
-        WS[WebSocketHandler<br/>实时广播]
+        WH["WebhookController<br/>签名验证"]
+        SS["ScanService<br/>@Async 异步"]
+        DP["DiffParser<br/>拉取&解析 Diff"]
+        SE["SkillEngine<br/>加载 system-prompt"]
+        AC["AgentCore<br/>格式化 + 调用 LLM"]
+        LLM["LlmGateway<br/>OpenAI 兼容协议"]
+        DB[("MySQL<br/>scan_task / scan_issue")]
+        RD[("Redis<br/>热配置 / 缓存")]
+        NS["NotifyService<br/>飞书 + 邮件"]
+        WS["WebSocketHandler<br/>实时广播"]
     end
 
     subgraph FristAgent Web
-        DASH[Dashboard<br/>统计 + 趋势图]
-        LIST[PR 扫描列表<br/>实时进度条]
-        DETAIL[扫描详情<br/>Issue 标注]
-        CHAT[智能对话<br/>多轮持久化]
-        CONF[配置中心<br/>仓库/Skill/模型]
+        DASH["Dashboard<br/>统计 + 趋势图"]
+        LIST["PR 扫描列表<br/>实时进度条"]
+        DETAIL["扫描详情<br/>Issue 标注"]
+        CHAT["智能对话<br/>多轮持久化"]
+        CONF["配置中心<br/>仓库/Skill/模型"]
     end
 
     GH -->|Webhook PR 事件| WH

@@ -1,0 +1,271 @@
+<h2>Top Navigation — 详细方案</h2>
+<p class="subtitle">左：当前布局 / 右：改后效果。关键问题：配置子项如何处理？</p>
+
+<style>
+.before-after {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+.ba-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4A5878;
+  margin-bottom: 8px;
+}
+.ba-label.after { color: #3B82F6; }
+
+/* Shared mock styles */
+.mock-frame {
+  background: #08090D;
+  border: 1px solid #1E2D44;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 0;
+}
+
+/* ── Before: Sidebar layout ── */
+.before-body { display: flex; height: 200px; }
+.bef-sidebar {
+  width: 60px; background: #0D0F17; border-right: 1px solid #1E2D44;
+  display: flex; flex-direction: column; padding: 8px 6px; gap: 4px; flex-shrink: 0;
+}
+.bef-logo { height: 18px; background: rgba(37,99,235,0.2); border-radius: 4px; margin-bottom: 6px; }
+.bef-nav { height: 14px; background: #1E2D44; border-radius: 3px; }
+.bef-nav.act { background: rgba(37,99,235,0.25); }
+.bef-nav-sep { height: 1px; background: #1E2D44; margin: 6px 0; }
+.bef-main {
+  flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 6px; overflow: hidden;
+}
+.bef-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.bef-stat { height: 32px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; }
+.bef-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; flex: 1; }
+.bef-chart { background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; min-height: 50px; }
+/* Show the "wasted" right space on config page */
+.bef-config { flex: 1; padding: 10px; display: flex; gap: 6px; }
+.bef-form { width: 100px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; }
+.bef-info { width: 42px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; }
+.bef-void { flex: 1; }
+.void-label {
+  height: 100%; display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: #253450; letter-spacing: 0.05em; font-weight: 600;
+  font-family: monospace; border: 1px dashed #1E2D44; border-radius: 5px;
+}
+
+/* ── After: Top Nav layout ── */
+.aft-topbar {
+  height: 38px; background: #0D0F17; border-bottom: 1px solid #1E2D44;
+  display: flex; align-items: center; gap: 6px; padding: 0 12px;
+}
+.aft-logo { width: 20px; height: 20px; border-radius: 5px; background: rgba(37,99,235,0.3); flex-shrink: 0; }
+.aft-sep { width: 1px; height: 14px; background: #1E2D44; margin: 0 2px; }
+.aft-navlink { height: 20px; border-radius: 4px; background: #1E2D44; display: inline-block; }
+.aft-navlink.act { background: rgba(37,99,235,0.2); }
+.aft-spacer { flex: 1; }
+.aft-skill { height: 18px; width: 80px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); border-radius: 10px; }
+.aft-theme { width: 26px; height: 18px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 4px; }
+
+.aft-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.aft-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.aft-stat { height: 34px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; }
+.aft-charts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+.aft-chart { height: 52px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; }
+.aft-recent { height: 30px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; }
+
+/* After config page */
+.aft-config { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 10px; }
+.aft-config-card { background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; height: 80px; }
+
+/* Second question: config nav style */
+.config-q {
+  margin-top: 24px;
+  border-top: 1px solid #1E2D44;
+  padding-top: 20px;
+}
+.config-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+.config-opt {
+  background: #161B2B;
+  border: 2px solid #1E2D44;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.18s;
+}
+.config-opt:hover { border-color: #3B82F6; }
+.config-opt.selected { border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+.config-opt-label {
+  padding: 10px 12px 8px;
+  font-size: 12px; font-weight: 600; color: #E8EDF5;
+}
+.config-opt-desc {
+  padding: 0 12px 10px;
+  font-size: 11px; color: #4A5878; line-height: 1.5;
+}
+
+/* Config mock A: dropdown */
+.cnav-a { display: flex; align-items: center; gap: 4px; padding: 6px 10px; background: #0D0F17; border-bottom: 1px solid #1E2D44; }
+.cnav-link { height: 16px; border-radius: 3px; background: #1E2D44; display: inline-block; }
+.cnav-link.act { background: rgba(37,99,235,0.25); }
+.dropdown-mock { position: relative; display: inline-block; }
+.dropdown-box {
+  margin-top: 3px; background: #161B2B; border: 1px solid #253450;
+  border-radius: 6px; padding: 4px; display: flex; flex-direction: column; gap: 2px; width: 70px;
+}
+.dd-item { height: 13px; background: #1E2D44; border-radius: 3px; }
+.dd-item.act { background: rgba(37,99,235,0.2); }
+
+/* Config mock B: sub-nav bar */
+.cnav-b-top { display: flex; align-items: center; gap: 4px; padding: 5px 10px; background: #0D0F17; border-bottom: 1px solid #1E2D44; }
+.cnav-b-sub { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: #0D0F17; border-bottom: 1px solid #1E2D44; }
+.subnav-item { height: 14px; border-radius: 3px; background: #1E2D44; display: inline-block; }
+.subnav-item.act { background: rgba(37,99,235,0.2); border-bottom: 1px solid #3B82F6; }
+
+/* Config mock C: top tabs inside page */
+.cnav-c-top { display: flex; align-items: center; gap: 4px; padding: 5px 10px; background: #0D0F17; border-bottom: 1px solid #1E2D44; }
+.page-tabs { display: flex; gap: 3px; padding: 8px 10px 0; background: #0D0F17; border-bottom: 1px solid #1E2D44; }
+.ptab { height: 16px; border-radius: 4px 4px 0 0; background: #1E2D44; display: inline-block; }
+.ptab.act { background: #161B2B; border: 1px solid #1E2D44; border-bottom-color: #161B2B; }
+</style>
+
+<!-- Before/After -->
+<div class="before-after">
+  <div>
+    <div class="ba-label">当前（侧边栏）</div>
+    <div class="mock-frame">
+      <div class="before-body">
+        <div class="bef-sidebar">
+          <div class="bef-logo"></div>
+          <div class="bef-nav act"></div>
+          <div class="bef-nav"></div>
+          <div class="bef-nav"></div>
+          <div class="bef-nav-sep"></div>
+          <div class="bef-nav"></div>
+          <div class="bef-nav"></div>
+          <div class="bef-nav"></div>
+          <div class="bef-nav"></div>
+        </div>
+        <!-- config page showing wasted space -->
+        <div class="bef-config">
+          <div class="bef-form"></div>
+          <div class="bef-info"></div>
+          <div class="bef-void"><div class="void-label">右侧空白</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#4A5878;margin-top:6px;text-align:center">配置页：左重右空，视觉失衡</div>
+  </div>
+  <div>
+    <div class="ba-label after">改后（顶部导航）</div>
+    <div class="mock-frame">
+      <div class="aft-topbar">
+        <div class="aft-logo"></div>
+        <div class="aft-sep"></div>
+        <div class="aft-navlink act" style="width:52px"></div>
+        <div class="aft-navlink" style="width:42px"></div>
+        <div class="aft-navlink" style="width:38px"></div>
+        <div class="aft-navlink" style="width:36px"></div>
+        <div class="aft-spacer"></div>
+        <div class="aft-skill"></div>
+        <div class="aft-theme"></div>
+      </div>
+      <!-- dashboard content: full width, 4+3 grid -->
+      <div class="aft-body">
+        <div class="aft-stats">
+          <div class="aft-stat"></div>
+          <div class="aft-stat"></div>
+          <div class="aft-stat"></div>
+          <div class="aft-stat"></div>
+        </div>
+        <div class="aft-charts">
+          <div class="aft-chart"></div>
+          <div class="aft-chart"></div>
+          <div class="aft-chart"></div>
+        </div>
+        <div class="aft-recent"></div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#3B82F6;margin-top:6px;text-align:center">Dashboard：全宽利用，图表变三列更平衡</div>
+  </div>
+</div>
+
+<!-- Second question: config nav -->
+<div class="config-q">
+  <h3 style="font-size:13px;font-weight:600;color:#E8EDF5;margin-bottom:4px">配置子项怎么导航？</h3>
+  <p class="subtitle" style="margin-bottom:0">顶部 nav 只有一级，4 个配置子页需要处理</p>
+
+  <div class="config-options">
+
+    <div class="config-opt" data-choice="config-dropdown" onclick="toggleSelect(this)">
+      <div class="config-opt-label">X1 · 「配置」下拉菜单</div>
+      <div class="mock-frame" style="margin:0 10px 10px;">
+        <div class="cnav-a">
+          <div class="cnav-link" style="width:42px"></div>
+          <div class="cnav-link" style="width:36px"></div>
+          <div class="cnav-link" style="width:32px"></div>
+          <div class="cnav-link act" style="width:32px"></div>
+        </div>
+        <div style="padding:4px 10px;">
+          <div class="dropdown-box">
+            <div class="dd-item"></div>
+            <div class="dd-item act"></div>
+            <div class="dd-item"></div>
+            <div class="dd-item"></div>
+          </div>
+        </div>
+      </div>
+      <div class="config-opt-desc">点击「配置」展开下拉，选子项。导航栏最简洁，但悬浮菜单交互略繁琐</div>
+    </div>
+
+    <div class="config-opt" data-choice="config-subnav" onclick="toggleSelect(this)">
+      <div class="config-opt-label">X2 · 二级导航栏</div>
+      <div class="mock-frame" style="margin:0 10px 10px;">
+        <div class="cnav-b-top">
+          <div class="cnav-link" style="width:42px"></div>
+          <div class="cnav-link" style="width:36px"></div>
+          <div class="cnav-link" style="width:32px"></div>
+          <div class="cnav-link act" style="width:32px"></div>
+        </div>
+        <div class="cnav-b-sub">
+          <div class="subnav-item act" style="width:44px"></div>
+          <div class="subnav-item" style="width:40px"></div>
+          <div class="subnav-item" style="width:38px"></div>
+          <div class="subnav-item" style="width:44px"></div>
+        </div>
+      </div>
+      <div class="config-opt-desc">进入配置区后，顶栏下方出现子导航行。清晰、可见，常见于 GitHub Settings 等产品</div>
+    </div>
+
+    <div class="config-opt" data-choice="config-sidebar" onclick="toggleSelect(this)">
+      <div class="config-opt-label">X3 · 配置页内左侧小菜单</div>
+      <div class="mock-frame" style="margin:0 10px 10px;">
+        <div class="cnav-c-top">
+          <div class="cnav-link" style="width:42px"></div>
+          <div class="cnav-link" style="width:36px"></div>
+          <div class="cnav-link" style="width:32px"></div>
+          <div class="cnav-link act" style="width:32px"></div>
+        </div>
+        <div style="display:flex;gap:5px;padding:6px 10px;">
+          <div style="width:50px;display:flex;flex-direction:column;gap:3px;">
+            <div style="height:13px;background:rgba(37,99,235,0.2);border-radius:3px;"></div>
+            <div style="height:13px;background:#1E2D44;border-radius:3px;"></div>
+            <div style="height:13px;background:#1E2D44;border-radius:3px;"></div>
+            <div style="height:13px;background:#1E2D44;border-radius:3px;"></div>
+          </div>
+          <div style="flex:1;background:#161B2B;border:1px solid #1E2D44;border-radius:4px;height:52px;"></div>
+        </div>
+      </div>
+      <div class="config-opt-desc">配置区域内嵌一个小型左侧菜单。只在配置页出现，与整体顶导不冲突</div>
+    </div>
+
+  </div>
+</div>
+
+<p style="font-size:12px;color:#4A5878;margin-top:16px;text-align:center">点击选择配置导航方式，或在终端告诉我</p>

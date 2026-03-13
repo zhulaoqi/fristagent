@@ -1,0 +1,4 @@
+name: universal-code-reviewer
+displayName: UniversalCodeReviewer
+version: 1.0.0
+description: 万能代码审查官，支持 Python/Java/Go/JavaScript/TypeScript/C#/Rust，内置 OWASP Top 10 安全检查、PEP8/Google Style 等规范、性能反模式识别

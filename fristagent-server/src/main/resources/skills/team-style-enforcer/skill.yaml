@@ -1,0 +1,4 @@
+name: team-style-enforcer
+displayName: TeamStyleEnforcer
+version: 1.0.0
+description: 团队风格守护者，全语言支持（基于 AST + 正则），支持上传 .style.yaml 动态适配团队规范，无需修改 Skill 本体即可适配不同项目

@@ -1,0 +1,182 @@
+<h2>选择布局方案</h2>
+<p class="subtitle">当前问题：<code>max-width: 1280px + margin: 0 auto</code> 导致宽屏下内容区居中但 Sidebar 固定左侧，视觉上偏右。下面是 3 种修复方案：</p>
+
+<style>
+  .mockup-shell {
+    display: flex;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #1E2D44;
+    background: #08090D;
+    margin-bottom: 10px;
+  }
+  .mockup-sidebar {
+    width: 48px;
+    background: #0D0F17;
+    border-right: 1px solid #1E2D44;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 4px;
+    flex-shrink: 0;
+  }
+  .mockup-sidebar .dot { width: 20px; height: 6px; border-radius: 3px; background: #1E2D44; }
+  .mockup-sidebar .dot.active { background: #3B82F6; }
+  .mockup-main {
+    flex: 1;
+    padding: 8px;
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    overflow: hidden;
+  }
+  .mockup-content-full {
+    flex: 1;
+    background: #161B2B;
+    border-radius: 4px;
+    border: 1px solid #1E2D44;
+  }
+  .mockup-content-centered-wide {
+    width: 90%;
+    margin: 0 auto;
+    background: #161B2B;
+    border-radius: 4px;
+    border: 1px solid #253450;
+  }
+  .mockup-gap {
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 4px,
+      #1a2035 4px,
+      #1a2035 5px
+    );
+    opacity: 0.5;
+    width: 5%;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .badge-rec {
+    display: inline-block;
+    background: #10B98120;
+    color: #10B981;
+    border: 1px solid #10B98140;
+    border-radius: 4px;
+    font-size: 10px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .code-block {
+    background: #0D0F17;
+    border: 1px solid #1E2D44;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+  .code-block .remove { color: #EF4444; text-decoration: line-through; opacity: 0.8; }
+  .code-block .add { color: #10B981; }
+  .code-block .keep { color: #8B9BB4; }
+  .screen-label {
+    font-size: 10px;
+    color: #4A5878;
+    margin-bottom: 4px;
+  }
+</style>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>全流式布局 <span class="badge-rec">推荐</span></h3>
+      <p>移除 max-width 限制，内容始终撑满可用区域，加水平 padding 防止贴边。1440px、1920px 均全屏。</p>
+      <div class="screen-label">1920px 宽屏效果示意</div>
+      <div class="mockup-shell">
+        <div class="mockup-sidebar">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="mockup-main">
+          <div class="mockup-content-full"></div>
+        </div>
+      </div>
+      <div class="code-block">
+        <span class="keep">.content-wrap {</span><br>
+        &nbsp;&nbsp;<span class="remove">max-width: 1280px;</span><br>
+        &nbsp;&nbsp;<span class="remove">margin: 0 auto;</span><br>
+        &nbsp;&nbsp;<span class="add">padding: 24px 32px;</span><br>
+        &nbsp;&nbsp;<span class="keep">width: 100%;</span><br>
+        <span class="keep">}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>宽 max-width 居中</h3>
+      <p>将上限放宽到 1600px，主流 1440px / 1920px 基本全屏，4K 超宽屏下仍有居中保护。</p>
+      <div class="screen-label">1920px 宽屏效果示意（约 90% 宽度）</div>
+      <div class="mockup-shell">
+        <div class="mockup-sidebar">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="mockup-main" style="position:relative;">
+          <div class="mockup-gap"></div>
+          <div class="mockup-content-centered-wide"></div>
+          <div class="mockup-gap"></div>
+        </div>
+      </div>
+      <div class="code-block">
+        <span class="keep">.content-wrap {</span><br>
+        &nbsp;&nbsp;<span class="remove">max-width: 1280px;</span><br>
+        &nbsp;&nbsp;<span class="add">max-width: 1600px;</span><br>
+        &nbsp;&nbsp;<span class="keep">margin: 0 auto;</span><br>
+        &nbsp;&nbsp;<span class="add">padding: 24px 32px;</span><br>
+        &nbsp;&nbsp;<span class="keep">width: 100%;</span><br>
+        <span class="keep">}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>各页面自控宽度</h3>
+      <p>AppLayout 完全去掉限制，各页面自己决定内容宽度。Chat 全宽，Dashboard 可独立配置卡片布局。灵活但需要逐页处理。</p>
+      <div class="screen-label">布局结构示意</div>
+      <div class="mockup-shell">
+        <div class="mockup-sidebar">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="mockup-main">
+          <div class="mockup-content-full" style="display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:10px;color:#4A5878;">各 View 自定义宽度</span>
+          </div>
+        </div>
+      </div>
+      <div class="code-block">
+        <span class="keep">/* AppLayout 去掉全局限制 */</span><br>
+        <span class="keep">.content-wrap { width: 100%; height: 100%; }</span><br>
+        <br>
+        <span class="add">/* 各 View 按需加 */</span><br>
+        <span class="add">.page-inner { max-width: 960px; margin: 0 auto; }</span>
+      </div>
+    </div>
+  </div>
+
+</div>

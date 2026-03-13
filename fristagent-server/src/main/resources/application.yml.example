@@ -1,0 +1,74 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: fristagent
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/fristagent?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: YOUR_DB_PASSWORD
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 3000ms
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+fristagent:
+  # LLM 配置（支持任何 OpenAI 兼容协议）
+  # 也可通过环境变量覆盖：LLM_ENDPOINT / LLM_API_KEY / LLM_MODEL
+  llm:
+    endpoint: ${LLM_ENDPOINT:https://api.openai.com}   # 示例：https://api.openai.com / https://api.deepseek.com
+    api-key: ${LLM_API_KEY:YOUR_LLM_API_KEY}
+    model: ${LLM_MODEL:gpt-4o}                         # 示例：gpt-4o / deepseek-chat / qwen2.5-72b-instruct
+    timeout-seconds: 120
+    max-tokens: 4096
+
+  # Skill 数据目录（自定义 Skill 存放路径，启动时自动创建）
+  skill:
+    data-dir: ${user.home}/.fristagent/skills
+
+  # GitHub Token（可选，私有仓库下载 Diff 时需要）
+  github:
+    token: ${GITHUB_TOKEN:}
+
+  # 飞书开放平台配置（可选，不配置则跳过飞书通知）
+  feishu:
+    app-id: ${FEISHU_APP_ID:}
+    app-secret: ${FEISHU_APP_SECRET:}
+
+  # 通知邮件发件人
+  notify:
+    mail-from: ${MAIL_FROM:noreply@example.com}
+    mail-from-name: FristAgent

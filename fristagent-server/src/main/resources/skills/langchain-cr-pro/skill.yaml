@@ -1,0 +1,5 @@
+name: langchain-cr-pro
+displayName: LangChain-CR-Pro
+version: 1.0.0
+description: 专为 LLM 应用优化的代码审查器，能识别 prompt injection、token 泄露、异步阻塞等 AI 原生风险，适用于 Agent 系统、LLM 应用开发场景
+

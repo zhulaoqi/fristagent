@@ -1,0 +1,82 @@
+/* ======================================================
+   FristAgent Design System - Dark OLED Theme
+   Primary: #2563EB  |  Font: Inter
+   ====================================================== */
+
+:root {
+  /* Backgrounds */
+  --bg-base:      #08090D;
+  --bg-primary:   #0D0F17;
+  --bg-secondary: #111420;
+  --bg-card:      #161B2B;
+  --bg-hover:     #1A2035;
+  --bg-active:    #1E2640;
+
+  /* Borders */
+  --border:       #1E2D44;
+  --border-light: #253450;
+
+  /* Text */
+  --text-primary:   #E8EDF5;
+  --text-secondary: #8B9BB4;
+  --text-muted:     #4A5878;
+
+  /* Accent */
+  --accent-blue:    #2563EB;
+  --accent-blue-2:  #3B82F6;
+  --accent-blue-glow: rgba(37, 99, 235, 0.25);
+  --accent-green:   #10B981;
+  --accent-red:     #EF4444;
+  --accent-yellow:  #F59E0B;
+  --accent-orange:  #F97316;
+  --accent-purple:  #8B5CF6;
+
+  /* Severity */
+  --severity-high:   #EF4444;
+  --severity-medium: #F59E0B;
+  --severity-low:    #6B7280;
+
+  /* Issue type */
+  --type-bug:        #EF4444;
+  --type-security:   #F97316;
+  --type-performance:#8B5CF6;
+  --type-style:      #3B82F6;
+  --type-suggestion: #10B981;
+
+  /* Radius */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
+
+  /* Transitions */
+  --transition: 180ms ease;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px var(--border);
+  --shadow-glow: 0 0 20px var(--accent-blue-glow);
+
+  /* Font */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ── Light Theme ──────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-base:      #EEF2F8;
+  --bg-primary:   #FFFFFF;
+  --bg-secondary: #F6F8FD;
+  --bg-card:      #FFFFFF;
+  --bg-hover:     #EBF0FA;
+  --bg-active:    #E2EAF6;
+
+  --border:       #DDE4F0;
+  --border-light: #C8D4E8;
+
+  --text-primary:   #0F172A;
+  --text-secondary: #475569;
+  --text-muted:     #94A3B8;
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px var(--border);
+  --shadow-glow: 0 0 20px rgba(37,99,235,0.12);
+}

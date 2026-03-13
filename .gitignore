@@ -1,0 +1,50 @@
+# ===== Java / Maven =====
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ===== Spring Boot =====
+# 真实配置文件（含密钥），不提交
+fristagent-server/src/main/resources/application.yml
+fristagent-server/src/main/resources/application-*.yml
+# 保留备份模板
+!fristagent-server/src/main/resources/application.yml.example
+
+# ===== Node / Frontend =====
+fristagent-web/node_modules/
+fristagent-web/dist/
+fristagent-web/.pnpm-store/
+fristagent-web/.vite/
+
+# ===== IDE =====
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Runtime / Logs =====
+*.log
+logs/
+spring-shell.log
+
+# ===== Skill 用户数据目录 =====
+.fristagent/
+
+# ===== 截图（大文件，可选保留） =====
+# docs/screenshots/

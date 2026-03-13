@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background -->
+  <rect width="32" height="32" rx="7" fill="#0D0F17"/>
+  <!-- Code brackets -->
+  <path d="M7 11 L4 16 L7 21" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M13 11 L16 16 L13 21" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Magnifier circle -->
+  <circle cx="22" cy="14" r="5" stroke="#10B981" stroke-width="2"/>
+  <!-- Magnifier handle -->
+  <line x1="26" y1="18" x2="29" y2="21" stroke="#10B981" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

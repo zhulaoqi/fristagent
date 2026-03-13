@@ -1,0 +1,362 @@
+<h2>完整布局设计方案</h2>
+<p class="subtitle">Top Navigation + 二级导航（配置区）— 三个核心页面预览</p>
+
+<style>
+.page-tabs-nav {
+  display: flex; gap: 6px; margin: 16px 0 12px;
+  border-bottom: 1px solid #1E2D44; padding-bottom: 0;
+}
+.ptab-btn {
+  padding: 6px 14px 8px;
+  font-size: 12px; font-weight: 500; color: #4A5878;
+  border: none; background: transparent; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: all 0.15s;
+}
+.ptab-btn.active { color: #E8EDF5; border-bottom-color: #3B82F6; }
+.ptab-btn:hover:not(.active) { color: #8B9BB4; }
+
+.page-preview { display: none; }
+.page-preview.show { display: block; }
+
+/* ══ Shared shell ══ */
+.app-frame {
+  background: #08090D;
+  border: 1px solid #1E2D44;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ── Top Nav Bar ── */
+.top-nav {
+  height: 44px; background: #0D0F17; border-bottom: 1px solid #1E2D44;
+  display: flex; align-items: center; gap: 0; padding: 0 16px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 6px; margin-right: 8px; flex-shrink: 0;
+}
+.nav-logo-icon {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: rgba(37,99,235,0.25); border: 1px solid rgba(37,99,235,0.4);
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-logo-dot { width: 8px; height: 8px; border-radius: 2px; background: #3B82F6; }
+.nav-logo-text { font-size: 13px; font-weight: 600; color: #E8EDF5; letter-spacing: -0.2px; }
+
+.nav-sep { width: 1px; height: 16px; background: #1E2D44; margin: 0 8px; }
+
+.nav-links { display: flex; align-items: center; gap: 1px; }
+.nav-link {
+  padding: 5px 10px; border-radius: 6px; font-size: 12.5px; font-weight: 450;
+  color: #8B9BB4; white-space: nowrap; cursor: pointer; transition: all 0.15s;
+}
+.nav-link.active { background: rgba(37,99,235,0.15); color: #3B82F6; font-weight: 500; }
+.nav-link:not(.active):hover { background: #1A2035; color: #E8EDF5; }
+
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.skill-pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 10px;
+  background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);
+}
+.skill-dot { width: 5px; height: 5px; border-radius: 50%; background: #10B981; box-shadow: 0 0 5px #10B981; }
+.skill-text { font-size: 10.5px; color: #10B981; font-weight: 500; }
+.theme-btn {
+  width: 28px; height: 28px; border-radius: 6px; background: #161B2B;
+  border: 1px solid #1E2D44; display: flex; align-items: center; justify-content: center;
+}
+.theme-icon { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #4A5878; }
+
+/* ── Sub Nav (Config) ── */
+.sub-nav {
+  height: 36px; background: #0D0F17; border-bottom: 1px solid #1E2D44;
+  display: flex; align-items: center; padding: 0 16px; gap: 0;
+}
+.sub-link {
+  padding: 6px 12px 6px; font-size: 12px; color: #4A5878; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;
+  height: 36px; display: flex; align-items: center; transition: all 0.15s;
+}
+.sub-link.active { color: #E8EDF5; border-bottom-color: #3B82F6; }
+.sub-link:hover:not(.active) { color: #8B9BB4; }
+
+/* ── Page content areas ── */
+.page-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Dashboard */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat-card {
+  background: #161B2B; border: 1px solid #1E2D44; border-radius: 8px;
+  padding: 14px; display: flex; align-items: center; gap: 10px;
+}
+.stat-icon { width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0; }
+.stat-lines { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.stat-val { height: 18px; background: #253450; border-radius: 4px; width: 50px; }
+.stat-lbl { height: 9px; background: #1E2D44; border-radius: 3px; width: 40px; }
+
+.charts-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; }
+.chart-card {
+  background: #161B2B; border: 1px solid #1E2D44; border-radius: 8px;
+  padding: 12px; height: 90px;
+}
+.chart-title { height: 9px; background: #1E2D44; border-radius: 3px; width: 80px; margin-bottom: 10px; }
+.chart-area { height: 54px; background: linear-gradient(180deg, rgba(59,130,246,0.12) 0%, transparent 100%); border-bottom: 1px solid rgba(59,130,246,0.3); border-radius: 4px; position: relative; }
+.chart-bar-area { height: 54px; display: flex; align-items: flex-end; gap: 6px; padding: 0 4px; }
+.cbar { background: rgba(59,130,246,0.4); border-radius: 3px 3px 0 0; flex: 1; }
+
+.recent-card {
+  background: #161B2B; border: 1px solid #1E2D44; border-radius: 8px; overflow: hidden;
+}
+.recent-header {
+  padding: 12px 14px; border-bottom: 1px solid #1E2D44;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.recent-title { height: 10px; background: #253450; border-radius: 3px; width: 60px; }
+.recent-link { height: 10px; background: #1E2D44; border-radius: 3px; width: 50px; }
+.recent-row { padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1E2D44; }
+.recent-row:last-child { border-bottom: none; }
+.rr-main { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.rr-t { height: 10px; background: #253450; border-radius: 3px; }
+.rr-sub { height: 8px; background: #1E2D44; border-radius: 3px; width: 60%; }
+.rr-badge { width: 40px; height: 16px; border-radius: 4px; }
+.rr-score { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #3B82F6; }
+
+/* Scan list page */
+.filter-bar { display: flex; gap: 8px; align-items: center; }
+.search-box { flex: 0 0 180px; height: 30px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 6px; }
+.filter-tabs { display: flex; gap: 3px; }
+.ftab { height: 30px; border-radius: 5px; background: #161B2B; border: 1px solid #1E2D44; display: flex; align-items: center; padding: 0 10px; }
+.ftab.act { background: rgba(37,99,235,0.12); border-color: rgba(37,99,235,0.3); }
+.ftab-text { height: 8px; border-radius: 2px; background: #253450; width: 24px; }
+.ftab.act .ftab-text { background: rgba(59,130,246,0.4); }
+.table-card { background: #161B2B; border: 1px solid #1E2D44; border-radius: 8px; overflow: hidden; }
+.t-head { padding: 8px 14px; background: #111420; border-bottom: 1px solid #1E2D44; display: flex; gap: 8px; }
+.th { height: 8px; background: #1E2D44; border-radius: 2px; }
+.t-row { padding: 12px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1E2D44; }
+.t-row:last-child { border-bottom: none; }
+.tr-title { flex: 2; display: flex; flex-direction: column; gap: 4px; }
+.tr-t { height: 10px; background: #253450; border-radius: 3px; }
+.tr-n { height: 8px; background: #1E2D44; border-radius: 3px; width: 40px; }
+.tr-cell { flex: 1; height: 14px; background: #1E2D44; border-radius: 4px; }
+
+/* Config page with sub-nav */
+.config-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px; }
+.config-card {
+  background: #161B2B; border: 1px solid #1E2D44; border-radius: 8px; padding: 16px;
+}
+.cfg-title { height: 10px; background: #253450; border-radius: 3px; width: 80px; margin-bottom: 14px; }
+.cfg-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.cfg-label { height: 8px; background: #1E2D44; border-radius: 2px; width: 60px; }
+.cfg-input { height: 26px; background: #111420; border: 1px solid #1E2D44; border-radius: 5px; }
+.cfg-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; padding-top: 10px; border-top: 1px solid #1E2D44; }
+.cfg-btn { height: 26px; border-radius: 5px; }
+.cfg-btn-sec { width: 60px; background: #1E2D44; }
+.cfg-btn-pri { width: 60px; background: rgba(37,99,235,0.3); }
+
+.info-card2 {
+  background: #161B2B; border: 1px solid #1E2D44; border-radius: 8px; padding: 16px;
+}
+.info-title2 { height: 10px; background: #253450; border-radius: 3px; width: 60px; margin-bottom: 12px; }
+.info-item { height: 8px; background: #1E2D44; border-radius: 2px; margin-bottom: 7px; }
+.info-item:nth-child(odd) { width: 90%; }
+.info-item:nth-child(even) { width: 75%; }
+</style>
+
+<!-- Page preview tabs -->
+<div class="page-tabs-nav">
+  <button class="ptab-btn active" onclick="showPage('dashboard', this)">Dashboard</button>
+  <button class="ptab-btn" onclick="showPage('scanlist', this)">PR 扫描列表</button>
+  <button class="ptab-btn" onclick="showPage('config', this)">配置页（模型）</button>
+</div>
+
+<!-- Dashboard -->
+<div id="p-dashboard" class="page-preview show">
+  <div class="app-frame">
+    <div class="top-nav">
+      <div class="nav-logo">
+        <div class="nav-logo-icon"><div class="nav-logo-dot"></div></div>
+        <div class="nav-logo-text">FristAgent</div>
+      </div>
+      <div class="nav-sep"></div>
+      <div class="nav-links">
+        <div class="nav-link active">Dashboard</div>
+        <div class="nav-link">PR 扫描</div>
+        <div class="nav-link">智能对话</div>
+        <div class="nav-link">配置</div>
+      </div>
+      <div class="nav-right">
+        <div class="skill-pill"><div class="skill-dot"></div><div class="skill-text">UniversalCodeReviewer</div></div>
+        <div class="theme-btn"><div class="theme-icon"></div></div>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-icon" style="background:rgba(59,130,246,0.1)"></div><div class="stat-lines"><div class="stat-val"></div><div class="stat-lbl"></div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.1)"></div><div class="stat-lines"><div class="stat-val"></div><div class="stat-lbl"></div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:rgba(139,92,246,0.1)"></div><div class="stat-lines"><div class="stat-val"></div><div class="stat-lbl"></div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.1)"></div><div class="stat-lines"><div class="stat-val"></div><div class="stat-lbl"></div></div></div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title"></div>
+          <div class="chart-area" style="position:relative">
+            <svg width="100%" height="54" style="position:absolute;top:0;left:0" viewBox="0 0 200 54" preserveAspectRatio="none">
+              <polyline points="10,40 40,32 70,35 100,22 130,28 160,15 190,18" fill="none" stroke="rgba(59,130,246,0.6)" stroke-width="1.5"/>
+            </svg>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"></div>
+          <div class="chart-bar-area">
+            <div class="cbar" style="height:70%;background:rgba(239,68,68,0.5)"></div>
+            <div class="cbar" style="height:45%;background:rgba(249,115,22,0.5)"></div>
+            <div class="cbar" style="height:30%;background:rgba(139,92,246,0.5)"></div>
+            <div class="cbar" style="height:85%;background:rgba(59,130,246,0.5)"></div>
+            <div class="cbar" style="height:55%;background:rgba(16,185,129,0.5)"></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"></div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+            <div style="display:flex;align-items:center;gap:6px"><div style="height:6px;flex:1;background:#EF4444;border-radius:3px;opacity:0.7"></div><div style="height:6px;width:20px;background:#1E2D44;border-radius:2px"></div></div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="height:6px;flex:0.6;background:#F97316;border-radius:3px;opacity:0.7"></div><div style="height:6px;width:20px;background:#1E2D44;border-radius:2px"></div></div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="height:6px;flex:0.4;background:#8B5CF6;border-radius:3px;opacity:0.7"></div><div style="height:6px;width:20px;background:#1E2D44;border-radius:2px"></div></div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="height:6px;flex:0.8;background:#3B82F6;border-radius:3px;opacity:0.7"></div><div style="height:6px;width:20px;background:#1E2D44;border-radius:2px"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="recent-card">
+        <div class="recent-header"><div class="recent-title"></div><div class="recent-link"></div></div>
+        <div class="recent-row"><div class="rr-main"><div class="rr-t"></div><div class="rr-sub"></div></div><div class="rr-badge" style="background:rgba(16,185,129,0.15)"></div><div class="rr-score"></div></div>
+        <div class="recent-row"><div class="rr-main"><div class="rr-t"></div><div class="rr-sub"></div></div><div class="rr-badge" style="background:rgba(59,130,246,0.15)"></div><div class="rr-score" style="border-color:#10B981"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scan List -->
+<div id="p-scanlist" class="page-preview">
+  <div class="app-frame">
+    <div class="top-nav">
+      <div class="nav-logo"><div class="nav-logo-icon"><div class="nav-logo-dot"></div></div><div class="nav-logo-text">FristAgent</div></div>
+      <div class="nav-sep"></div>
+      <div class="nav-links">
+        <div class="nav-link">Dashboard</div>
+        <div class="nav-link active">PR 扫描</div>
+        <div class="nav-link">智能对话</div>
+        <div class="nav-link">配置</div>
+      </div>
+      <div class="nav-right">
+        <div class="skill-pill"><div class="skill-dot"></div><div class="skill-text">UniversalCodeReviewer</div></div>
+        <div class="theme-btn"><div class="theme-icon"></div></div>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="filter-bar">
+        <div class="search-box"></div>
+        <div class="filter-tabs">
+          <div class="ftab act"><div class="ftab-text"></div></div>
+          <div class="ftab"><div class="ftab-text"></div></div>
+          <div class="ftab"><div class="ftab-text"></div></div>
+          <div class="ftab"><div class="ftab-text"></div></div>
+        </div>
+        <div style="margin-left:auto;width:28px;height:28px;background:#161B2B;border:1px solid #1E2D44;border-radius:5px"></div>
+      </div>
+      <div class="table-card">
+        <div class="t-head">
+          <div class="th" style="flex:2.5"></div>
+          <div class="th" style="flex:1"></div>
+          <div class="th" style="flex:0.8"></div>
+          <div class="th" style="flex:1.2"></div>
+          <div class="th" style="flex:0.8"></div>
+          <div class="th" style="flex:0.6"></div>
+          <div class="th" style="flex:0.8"></div>
+        </div>
+        <div class="t-row"><div class="tr-title"><div class="tr-t"></div><div class="tr-n"></div></div><div class="tr-cell"></div><div class="tr-cell" style="max-width:56px"></div><div class="tr-cell"></div><div class="tr-cell" style="max-width:56px"></div><div style="width:28px;height:28px;border-radius:50%;border:1.5px solid #3B82F6"></div><div class="tr-cell" style="max-width:60px"></div></div>
+        <div class="t-row"><div class="tr-title"><div class="tr-t" style="width:80%"></div><div class="tr-n"></div></div><div class="tr-cell"></div><div class="tr-cell" style="max-width:56px"></div><div class="tr-cell"></div><div class="tr-cell" style="max-width:56px"></div><div style="width:28px;height:28px;border-radius:50%;border:1.5px solid #10B981"></div><div class="tr-cell" style="max-width:60px"></div></div>
+        <div class="t-row"><div class="tr-title"><div class="tr-t" style="width:65%"></div><div class="tr-n"></div></div><div class="tr-cell"></div><div class="tr-cell" style="max-width:56px"></div><div class="tr-cell"></div><div class="tr-cell" style="max-width:56px;background:rgba(249,115,22,0.2)"></div><div style="width:28px;height:28px;border-radius:50%;border:1.5px solid #4A5878"></div><div class="tr-cell" style="max-width:60px"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Config page -->
+<div id="p-config" class="page-preview">
+  <div class="app-frame">
+    <div class="top-nav">
+      <div class="nav-logo"><div class="nav-logo-icon"><div class="nav-logo-dot"></div></div><div class="nav-logo-text">FristAgent</div></div>
+      <div class="nav-sep"></div>
+      <div class="nav-links">
+        <div class="nav-link">Dashboard</div>
+        <div class="nav-link">PR 扫描</div>
+        <div class="nav-link">智能对话</div>
+        <div class="nav-link active">配置</div>
+      </div>
+      <div class="nav-right">
+        <div class="skill-pill"><div class="skill-dot"></div><div class="skill-text">UniversalCodeReviewer</div></div>
+        <div class="theme-btn"><div class="theme-icon"></div></div>
+      </div>
+    </div>
+    <!-- Sub-nav bar -->
+    <div class="sub-nav">
+      <div class="sub-link">仓库配置</div>
+      <div class="sub-link active">模型配置</div>
+      <div class="sub-link">Skill 管理</div>
+      <div class="sub-link">通知配置</div>
+    </div>
+    <!-- Config content: 2-column, fills width -->
+    <div class="config-body">
+      <div class="config-card">
+        <div class="cfg-title"></div>
+        <div class="cfg-field"><div class="cfg-label"></div><div class="cfg-input"></div></div>
+        <div class="cfg-field"><div class="cfg-label"></div><div class="cfg-input"></div></div>
+        <div class="cfg-field"><div class="cfg-label"></div><div class="cfg-input"></div></div>
+        <div class="cfg-field"><div class="cfg-label"></div><div class="cfg-input" style="height:18px"></div></div>
+        <div class="cfg-actions"><div class="cfg-btn cfg-btn-sec"></div><div class="cfg-btn cfg-btn-pri"></div></div>
+      </div>
+      <div class="info-card2">
+        <div class="info-title2"></div>
+        <div class="info-item"></div>
+        <div class="info-item"></div>
+        <div class="info-item"></div>
+        <div class="info-item"></div>
+        <div class="info-item"></div>
+        <div class="info-item"></div>
+        <div style="height:1px;background:#1E2D44;margin:10px 0"></div>
+        <div class="info-item" style="width:100%;height:30px;border-radius:4px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(id, btn) {
+  document.querySelectorAll('.page-preview').forEach(el => el.classList.remove('show'));
+  document.querySelectorAll('.ptab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('p-' + id).classList.add('show');
+  btn.classList.add('active');
+}
+</script>
+
+<div style="margin-top:20px;padding:14px 16px;background:#161B2B;border:1px solid #1E2D44;border-radius:8px;">
+  <div style="font-size:12px;font-weight:600;color:#8B9BB4;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em">设计要点</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div style="font-size:12px;color:#8B9BB4;padding-left:12px;position:relative">
+      <span style="position:absolute;left:0;color:#3B82F6">·</span>
+      顶栏高度 44px，Logo + 主导航 + 右侧工具区（ActiveSkill + 主题切换）
+    </div>
+    <div style="font-size:12px;color:#8B9BB4;padding-left:12px;position:relative">
+      <span style="position:absolute;left:0;color:#3B82F6">·</span>
+      配置区二级导航栏 36px，仅在 /config/* 路由下出现
+    </div>
+    <div style="font-size:12px;color:#8B9BB4;padding-left:12px;position:relative">
+      <span style="position:absolute;left:0;color:#3B82F6">·</span>
+      Dashboard 图表从 2 列改为 3 列（折线图更宽，平衡右侧空间）
+    </div>
+    <div style="font-size:12px;color:#8B9BB4;padding-left:12px;position:relative">
+      <span style="position:absolute;left:0;color:#3B82F6">·</span>
+      配置页内容去掉 max-width:960px，改为 2 列等分填满全宽
+    </div>
+  </div>
+</div>
+<p style="font-size:12px;color:#4A5878;margin-top:12px;text-align:center">点击上方 Tab 切换页面预览 · 有任何调整意见在终端告诉我</p>

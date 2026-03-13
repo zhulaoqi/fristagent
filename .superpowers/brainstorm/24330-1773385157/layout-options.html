@@ -1,0 +1,243 @@
+<h2>整体布局方案对比</h2>
+<p class="subtitle">当前问题：左侧侧边栏内容密集，主内容区整体偏左，右侧大量空白——下面三个方案解决这个问题</p>
+
+<style>
+.layout-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 16px;
+}
+.layout-card {
+  background: #161B2B;
+  border: 2px solid #1E2D44;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.layout-card:hover {
+  border-color: #3B82F6;
+}
+.layout-card.selected {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+}
+.layout-card-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #1E2D44;
+}
+.layout-card-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #E8EDF5;
+  margin: 0 0 4px;
+}
+.layout-card-header .tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+.tag-recommend { background: rgba(59,130,246,0.15); color: #3B82F6; }
+.tag-moderate  { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+.tag-minimal   { background: rgba(16,185,129,0.15); color: #10B981; }
+
+.mockup-wrap {
+  padding: 12px;
+}
+
+/* ── Mockup A: Top Nav ── */
+.m-a { display: flex; flex-direction: column; gap: 5px; }
+.m-a .topbar {
+  height: 34px; background: #0D0F17; border: 1px solid #1E2D44;
+  border-radius: 6px; display: flex; align-items: center; gap: 8px; padding: 0 10px;
+}
+.m-a .logo-dot { width: 14px; height: 14px; border-radius: 4px; background: #2563EB; flex-shrink: 0; }
+.m-a .nav-tabs { display: flex; gap: 4px; flex: 1; }
+.m-a .nav-tab {
+  height: 20px; border-radius: 4px; background: #1E2D44;
+  display: flex; align-items: center; padding: 0 8px; font-size: 9px; color: #8B9BB4;
+}
+.m-a .nav-tab.act { background: rgba(37,99,235,0.2); color: #3B82F6; }
+.m-a .content-area {
+  flex: 1; background: #0D0F17; border: 1px solid #1E2D44;
+  border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 6px; height: 110px;
+}
+.m-a .stat-row { display: flex; gap: 5px; }
+.m-a .stat-box { flex: 1; height: 28px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; }
+.m-a .chart-row { display: flex; gap: 5px; flex: 1; }
+.m-a .chart-box { flex: 1; background: #161B2B; border: 1px solid #1E2D44; border-radius: 5px; height: 50px; }
+
+/* ── Mockup B: Slim Sidebar + Right Panel ── */
+.m-b { display: flex; gap: 5px; height: 150px; }
+.m-b .slim-side {
+  width: 26px; background: #0D0F17; border: 1px solid #1E2D44;
+  border-radius: 6px; display: flex; flex-direction: column; align-items: center;
+  gap: 5px; padding: 8px 0;
+}
+.m-b .side-dot { width: 16px; height: 16px; border-radius: 4px; background: #1E2D44; }
+.m-b .side-dot.act { background: rgba(37,99,235,0.25); }
+.m-b .main-area {
+  flex: 1; background: #0D0F17; border: 1px solid #1E2D44;
+  border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 5px;
+}
+.m-b .top-bar { height: 22px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 4px; }
+.m-b .content-cols { display: flex; gap: 5px; flex: 1; }
+.m-b .main-col { flex: 1; background: #161B2B; border: 1px solid #1E2D44; border-radius: 4px; }
+.m-b .right-panel { width: 44px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 4px; }
+
+/* ── Mockup C: Keep Sidebar + Page Header ── */
+.m-c { display: flex; gap: 5px; height: 150px; }
+.m-c .side {
+  width: 44px; background: #0D0F17; border: 1px solid #1E2D44;
+  border-radius: 6px; display: flex; flex-direction: column; gap: 4px; padding: 8px 6px;
+}
+.m-c .side-item { height: 16px; background: #1E2D44; border-radius: 4px; }
+.m-c .side-item.act { background: rgba(37,99,235,0.25); }
+.m-c .main {
+  flex: 1; background: #0D0F17; border: 1px solid #1E2D44;
+  border-radius: 6px; display: flex; flex-direction: column; padding: 6px; gap: 5px;
+}
+.m-c .page-hdr { height: 28px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+.m-c .hdr-l { display: flex; gap: 5px; align-items: center; }
+.m-c .hdr-dot { width: 30px; height: 8px; background: #253450; border-radius: 3px; }
+.m-c .hdr-r { width: 40px; height: 16px; background: rgba(37,99,235,0.2); border-radius: 4px; }
+.m-c .body-cols { display: flex; gap: 5px; flex: 1; }
+.m-c .main-col { flex: 1; background: #161B2B; border: 1px solid #1E2D44; border-radius: 4px; }
+.m-c .right-col { width: 50px; background: #161B2B; border: 1px solid #1E2D44; border-radius: 4px; }
+
+.desc-list {
+  padding: 0 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.desc-item {
+  font-size: 11.5px;
+  color: #8B9BB4;
+  padding-left: 12px;
+  position: relative;
+  line-height: 1.5;
+}
+.desc-item::before { content: '·'; position: absolute; left: 0; color: #3B82F6; }
+.desc-item.pro::before { color: #10B981; content: '+'; }
+.desc-item.con::before { color: #EF4444; content: '−'; }
+</style>
+
+<div class="layout-cards">
+
+  <!-- Option A -->
+  <div class="layout-card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="layout-card-header">
+      <div class="tag tag-recommend">推荐</div>
+      <h3>A · Top Navigation</h3>
+      <div style="font-size:11px;color:#4A5878;margin-top:2px">侧边栏 → 顶部导航栏</div>
+    </div>
+    <div class="mockup-wrap">
+      <div class="m-a">
+        <div class="topbar">
+          <div class="logo-dot"></div>
+          <div class="nav-tabs">
+            <div class="nav-tab act">Dashboard</div>
+            <div class="nav-tab">PR 扫描</div>
+            <div class="nav-tab">对话</div>
+            <div class="nav-tab">配置</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="stat-row">
+            <div class="stat-box"></div>
+            <div class="stat-box"></div>
+            <div class="stat-box"></div>
+            <div class="stat-box"></div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-box"></div>
+            <div class="chart-box"></div>
+            <div class="chart-box"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-list">
+      <div class="desc-item pro">内容区占满全宽，左右完全平衡</div>
+      <div class="desc-item pro">视觉重心居中，现代 SaaS 常见模式</div>
+      <div class="desc-item pro">配置页面不再有右侧空白</div>
+      <div class="desc-item con">导航层级变浅，配置子项需折叠菜单</div>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="layout-card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="layout-card-header">
+      <div class="tag tag-moderate">适中改动</div>
+      <h3>B · 细侧边栏 + 右侧面板</h3>
+      <div style="font-size:11px;color:#4A5878;margin-top:2px">侧边栏收窄到图标，内容双栏</div>
+    </div>
+    <div class="mockup-wrap">
+      <div class="m-b">
+        <div class="slim-side">
+          <div class="side-dot act"></div>
+          <div class="side-dot"></div>
+          <div class="side-dot"></div>
+          <div class="side-dot"></div>
+        </div>
+        <div class="main-area">
+          <div class="top-bar"></div>
+          <div class="content-cols">
+            <div class="main-col"></div>
+            <div class="right-panel"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-list">
+      <div class="desc-item pro">侧边栏变细（48px），视觉压迫感减少</div>
+      <div class="desc-item pro">右侧面板填充空白（摘要/统计/操作）</div>
+      <div class="desc-item pro">保留侧边栏导航体验</div>
+      <div class="desc-item con">每个页面都需加右侧面板内容设计</div>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="layout-card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="layout-card-header">
+      <div class="tag tag-minimal">最小改动</div>
+      <h3>C · 保留侧边栏 + 页内顶栏</h3>
+      <div style="font-size:11px;color:#4A5878;margin-top:2px">每个页面加顶部 Header 条</div>
+    </div>
+    <div class="mockup-wrap">
+      <div class="m-c">
+        <div class="side">
+          <div class="side-item act"></div>
+          <div class="side-item"></div>
+          <div class="side-item"></div>
+          <div class="side-item"></div>
+          <div class="side-item"></div>
+        </div>
+        <div class="main">
+          <div class="page-hdr">
+            <div class="hdr-l"><div class="hdr-dot"></div></div>
+            <div class="hdr-r"></div>
+          </div>
+          <div class="body-cols">
+            <div class="main-col"></div>
+            <div class="right-col"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-list">
+      <div class="desc-item pro">改动最小，侧边栏完全保留</div>
+      <div class="desc-item pro">每页顶栏承载面包屑+快捷操作，横向平衡</div>
+      <div class="desc-item con">侧边栏左重问题没有根本解决</div>
+      <div class="desc-item con">内容右侧空白问题仍然存在</div>
+    </div>
+  </div>
+
+</div>
+
+<p style="font-size:12px;color:#4A5878;margin-top:16px;text-align:center">点击选择你倾向的方案，或在终端告诉我想法</p>

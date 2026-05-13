@@ -7,6 +7,7 @@ import lombok.Data;
  * WebSocket 推送消息统一结构
  *
  * type 枚举：
+ *   NEW_SCAN       — 新扫描任务创建（前端收到后刷新列表）
  *   SCAN_PROGRESS  — 扫描进度更新（step + percent）
  *   SCAN_LOG       — LLM 流式输出 chunk（AI 分析阶段实时推送）
  *   SCAN_DONE      — 扫描完成（含 score/summary）

@@ -82,9 +82,14 @@ public class DiffParser {
             RestClient client = builder.build();
             String result = client.get().uri(diffUrl).retrieve().body(String.class);
             return result != null ? result : "";
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            log.error("[DiffParser] HTTP {} downloading diff from {}: {}",
+                    e.getStatusCode().value(), diffUrl, e.getResponseBodyAsString());
+            throw new RuntimeException("Diff download failed (HTTP " + e.getStatusCode().value()
+                    + "). Check GitHub/GitLab token configuration.", e);
         } catch (Exception e) {
             log.error("[DiffParser] Failed to download diff from {}: {}", diffUrl, e.getMessage());
-            return "";
+            throw new RuntimeException("Diff download failed: " + e.getMessage(), e);
         }
     }
 

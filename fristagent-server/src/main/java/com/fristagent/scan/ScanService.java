@@ -48,6 +48,12 @@ public class ScanService {
         ScanTask task = createTask(event);
 
         try {
+            // Notify frontend: new scan task created
+            wsHandler.broadcast(WsMessage.builder()
+                    .type("NEW_SCAN")
+                    .taskId(task.getId())
+                    .build());
+
             // Step 1: 获取 Diff
             progress(task, "SCANNING", "正在连接仓库获取 Diff...", 10);
             DiffContext diff = diffParser.fetchAndParse(event);

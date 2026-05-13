@@ -54,6 +54,9 @@ watch(streamLog, () => {
   })
 })
 
+// stream log 折叠状态
+const streamLogExpanded = ref(true)
+
 const activeFilter = ref('ALL')
 const filters = [
   { label: '全部', value: 'ALL' },
@@ -156,14 +159,6 @@ const getStepState = (index, pct) => {
         </div>
         <div class="scanning-current">{{ scanningStep }}</div>
 
-        <!-- LLM 实时输出 -->
-        <div v-if="streamLog" class="stream-log-wrap">
-          <div class="stream-log-label">
-            <span class="stream-dot" />
-            AI 输出实时预览
-          </div>
-          <div class="stream-log-body" ref="logRef">{{ streamLog }}</div>
-        </div>
       </div>
     </Transition>
 
@@ -220,6 +215,19 @@ const getStepState = (index, pct) => {
           该类型无问题
         </div>
       </div>
+    </div>
+    <!-- AI 原始输出（有流式日志时显示，独立于扫描状态） -->
+    <div v-if="scan && streamLog" class="card stream-card">
+      <div class="stream-card-header" @click="streamLogExpanded = !streamLogExpanded">
+        <div class="stream-card-title">
+          <span v-if="isScanning" class="stream-dot" />
+          <span>AI 原始输出</span>
+          <span v-if="isScanning" class="stream-live-tag">实时</span>
+          <span v-else class="stream-session-tag">本次会话</span>
+        </div>
+        <span class="stream-toggle">{{ streamLogExpanded ? '收起' : '展开' }}</span>
+      </div>
+      <div v-if="streamLogExpanded" class="stream-log-body" ref="logRef">{{ streamLog }}</div>
     </div>
     </template>
   </div>
@@ -435,23 +443,25 @@ const getStepState = (index, pct) => {
   font-style: italic;
 }
 
-/* ---- LLM 流式输出区域 ---- */
-.stream-log-wrap {
-  margin-top: 16px;
-  border-top: 1px solid rgba(37, 99, 235, 0.15);
-  padding-top: 14px;
-}
+/* ---- AI 原始输出卡片 ---- */
+.stream-card { }
 
-.stream-log-label {
+.stream-card-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 0;
+}
+
+.stream-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+  color: var(--text-secondary);
 }
 
 .stream-dot {
@@ -463,7 +473,30 @@ const getStepState = (index, pct) => {
   flex-shrink: 0;
 }
 
+.stream-live-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--accent-blue-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stream-session-tag {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.stream-toggle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 .stream-log-body {
+  margin-top: 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -472,11 +505,10 @@ const getStepState = (index, pct) => {
   font-size: 12.5px;
   color: var(--text-secondary);
   line-height: 1.65;
-  max-height: 360px;
+  max-height: 400px;
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
-  /* 滚动条样式 */
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }

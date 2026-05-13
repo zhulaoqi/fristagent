@@ -21,10 +21,7 @@ export const useScanStore = defineStore('scan', () => {
       score:   msg.score   ?? null,
       summary: msg.summary ?? '',
     }
-    // 扫描结束时清空流式日志
-    if (msg.status === 'DONE' || msg.status === 'FAILED') {
-      delete streamLog.value[id]
-    }
+    // 扫描完成后不清除 streamLog，保留供 ScanDetail 查看原始 AI 输出
   })
 
   useWebSocket('SCAN_LOG', (msg) => {

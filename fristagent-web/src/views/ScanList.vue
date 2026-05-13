@@ -5,6 +5,7 @@ import { Search, RefreshCw } from 'lucide-vue-next'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import ScoreRing from '@/components/common/ScoreRing.vue'
 import { useScanStore } from '@/stores/scan'
+import { useWebSocket } from '@/composables/useWebSocket'
 import { scanApi } from '@/api'
 import dayjs from 'dayjs'
 
@@ -34,6 +35,12 @@ async function loadScans() {
 
 onMounted(() => loadScans())
 watch(filterStatus, () => { page.value = 0; loadScans() })
+
+// 新 PR 触发扫描时，自动刷新列表（回到第一页）
+useWebSocket('NEW_SCAN', () => {
+  page.value = 0
+  loadScans()
+})
 
 // 合并实时进度到扫描列表
 const mergedScans = computed(() => scans.value.map(s => {
